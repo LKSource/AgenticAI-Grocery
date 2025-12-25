@@ -2,7 +2,7 @@
 import os
 import json
 import re
-from typing import List, Dict, Any
+from typing import Dict, Any
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
@@ -20,9 +20,10 @@ llm = ChatGoogleGenerativeAI(
 
 KNOWN_ITEMS = {
     "milk", "eggs", "bread", "coffee", "bananas", "tomatoes", "rice", "pasta",
-    "cheese", "chicken", "apple", "orange", "yogurt", "butter", "sugar", "salt",
-    "lettuce", "carrot", "potato", "onion"
+    "cheese", "chicken", "apple", "orange", "yogurt", "butter", "sugar",
+    "salt", "lettuce", "carrot", "potato", "onion"
 }
+
 
 def parse_grocery_list(state: Dict[str, Any]) -> Dict[str, Any]:
     messages = state["messages"]
@@ -40,7 +41,8 @@ def parse_grocery_list(state: Dict[str, Any]) -> Dict[str, Any]:
     new_budget = current_budget
 
     # Handle "avoid store"
-    store_map = {"walmart": "Walmart", "amazon": "Amazon Fresh", "instacart": "Instacart", "kroger": "Kroger"}
+    store_map = {"walmart": "Walmart", "amazon": "Amazon Fresh",
+                 "instacart": "Instacart", "kroger": "Kroger"}
     for key, full in store_map.items():
         if f"avoid {key}" in lower_msg and full not in new_avoid:
             new_avoid.append(full)
@@ -72,7 +74,8 @@ def parse_grocery_list(state: Dict[str, Any]) -> Dict[str, Any]:
         # Parse as new grocery list
         prompt = ChatPromptTemplate.from_messages([
             ("system", """
-You are a grocery assistant. Return ONLY JSON like: {{"items": ["milk", "eggs"], "budget": 20.0}}
+You are a grocery assistant. Return ONLY JSON like: {{"items": ["milk", "eggs"]
+, "budget": 20.0}}
 If no budget, omit it. If no items, return {{"items": []}}.
             """.strip()),
             ("human", "{input}")
@@ -84,8 +87,11 @@ If no budget, omit it. If no items, return {{"items": []}}.
         if json_match:
             try:
                 data = json.loads(json_match.group())
-                extracted = [item.strip().lower() for item in data.get("items", [])]
-                valid_items = [item for item in extracted if any(kw in item for kw in KNOWN_ITEMS)]
+                extracted = [item.strip().lower() for item in data.get("items",
+                                                                       [])]
+                valid_items = [item for item in extracted if any(kw in item
+                                                                 for kw in
+                                                                 KNOWN_ITEMS)]
                 if valid_items:
                     new_list = valid_items
                 new_budget = data.get("budget", current_budget)

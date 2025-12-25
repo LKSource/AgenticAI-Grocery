@@ -1,5 +1,4 @@
 # main.py
-import os
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, START, END
 from state import GroceryState
@@ -66,10 +65,8 @@ if __name__ == "__main__":
     for i, user_msg in enumerate(conversation):
         print(f"\n{'='*60}")
         print(f"👉 TURN {i+1}: User says: \"{user_msg}\"")
-        
         # Append user message
         state["messages"].append(HumanMessage(content=user_msg))
-        
         # Run the graph (it will loop internally if needed)
         state = app.invoke(state)
         
